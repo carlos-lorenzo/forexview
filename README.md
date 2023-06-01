@@ -1,0 +1,2 @@
+# forexview
+Tradingview ripoff (free)
