@@ -1,9 +1,26 @@
 <!DOCTYPE html>
 <head>
     <title>Forex Backtester</title>
+    <link rel="stylesheet" href="/Frontend/css/style.css">
 </head>
 <body>
-    <div id="chart-container"></div>
-    <button id="new-candle">New Candle</button>
+
+    <div class="trading-view">
+        <div class="chart-container">
+            <h1 class="chart-title">1m</h1>
+            <div class="chart" id="1m"></div>
+            <button class="new-candle" id="1m-new-candle">New 1m Candle</button>
+        </div>
+    
+        <div class="chart-container">
+            <h1 class="chart-title">15m</h1>
+            <div class="chart" id="15m"></div>
+            <button class="new-candle" id="15m-new-candle">New 15m Candle</button>
+        </div>
+
+        
+    </div>
+   
     <script type="module" src="/Frontend/js/chart.js"></script> 
+    
 </body>
