@@ -34,17 +34,18 @@ def interval_to_minutes(interval: str) -> int:
         return multiplyer * scales.get(scale)
     
 
-def defractalise_ohlc(df: pd.DataFrame, interval: str):
+def defractalise_ohlc(df: pd.DataFrame, interval: str) -> Dict:
     """
     Convert a mintute ohlc DataFrame into a higher tf DataFrame\n
     For example: 1m -> 1h (specified by interval)
 
     Args:
         df (pd.DataFrame): 1m ohlc (and Volume) DataFrane
-        interval (str): _description_
+        interval (str): An interval of time in the format (1m, 15m, 4h, ...)
 
     Returns:
-        _type_: _description_
+        Dict: {ohlc: the actual ohlc data,
+                 n_candles: number of candles used to create data (set by interval)}
     """
     
     n_candles = interval_to_minutes(interval=interval)
@@ -74,4 +75,7 @@ def defractalise_ohlc(df: pd.DataFrame, interval: str):
         
 
         
-    return pd.DataFrame(ohlc_data, columns=df.columns)
+    return {
+        "ohlc": pd.DataFrame(ohlc_data, columns=df.columns),
+        "n_candles": n_candles
+    }
