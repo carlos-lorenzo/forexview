@@ -57,10 +57,10 @@ class Position:
         
         
         if not self.stop_loss:
-            self.stop_loss = self.order_rate - (2 * self.PIP) if self.order_type == "long" else self.order_rate + (2 * self.PIP)
+            self.stop_loss = round((self.order_rate - (2 * self.PIP) if self.order_type == "long" else self.order_rate + (2 * self.PIP)), 5)
 
         if not self.take_profit:
-            self.take_profit = self.order_rate + (20 * self.PIP) if self.order_type == "long" else self.order_rate - (20 * self.PIP)
+            self.take_profit = round((self.order_rate + (20 * self.PIP) if self.order_type == "long" else self.order_rate - (20 * self.PIP)), 5)
         
         
         if self.order_type == "long":
@@ -71,26 +71,28 @@ class Position:
           
     
     def __update_profit_loss(self, current_rate: float) -> None:
-        if self.order_type == "buy":
+        if self.order_type == "long":
             price_change = (current_rate - self.order_rate) / (self.take_profit - self.order_rate)
 
         else:
             price_change = (self.order_rate - current_rate) / (self.order_rate - self.take_profit)
             
-        self.profit_loss = round((price_change * (self.starting_size * self.risk_reward)), 2)
+        self.profit_loss = round((price_change * self.starting_size * self.risk_reward), 2)
                 
 
     def update_status(self, current_candle: Dict[str, float]) -> None:
-        high_rate = current_candle.get("high", self.order_rate)
-        low_rate = current_candle.get("low", self.order_rate)
-        close_rate = current_candle.get("close", self.order_rate)
+        high = current_candle.get("high", self.order_rate)
+        low = current_candle.get("low", self.order_rate)
+        close = current_candle.get("close", self.order_rate)
         
-        self.__update_profit_loss(current_rate=close_rate)
+        self.__update_profit_loss(current_rate=close)
         
         if self.order_type == "long":
-            if high_rate >= self.take_profit or low_rate <= self.stop_loss:
-                self.active = False
+            if high >= self.take_profit or low <= self.stop_loss:
+                self.active = True
+                
                  
         else:
-            if high_rate <= self.take_profit or low_rate >= self.stop_loss:
-                self.active = False
+            if high <= self.take_profit or low >= self.stop_loss:
+                self.active = True
+                
