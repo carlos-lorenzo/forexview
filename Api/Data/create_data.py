@@ -82,7 +82,7 @@ def defractalise_ohlc(df: pd.DataFrame, interval: str) -> Dict:
 
 
 
-df = pd.read_csv("Api/Data/source.csv", nrows=100000, skiprows=range(1, 3))
+df = pd.read_csv("Api/Data/source.csv")
 
 df = df.rename(columns={"Open": "open",
                         "High": "high",
@@ -112,6 +112,7 @@ df.to_csv("Api/Data/1m_EURUSD.csv", index=False)
 
 for tf, ohlc_data in time_frames.items():
     df: pd.DataFrame = ohlc_data.get("ohlc")
-    df.to_csv(f"Api/Data/{tf}_EURUSD.csv", index=False)
-    """
+    df.to_csv(f"{tf}_EURUSD_F.csv", index=False)
 
+
+"""

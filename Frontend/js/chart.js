@@ -1,5 +1,7 @@
 import { createChart } from '/node_modules/lightweight-charts/dist/lightweight-charts.standalone.development.mjs';
 
+import { updateBalance } from "/Frontend/js/broker.js"
+
 document.getElementById("reset-time").addEventListener("click", function(){
     fetch("http://127.0.0.1:5000/api/reset-time", {
         method: "POST"})
@@ -90,6 +92,8 @@ chartUpdates.forEach(updateData => {
             } else {
                 setChartData(chartTimeFrame, candlestickSeries);
             }
-        }    
+        }
+        
+        updateBalance()
     });
 })

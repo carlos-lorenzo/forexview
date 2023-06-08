@@ -33,7 +33,18 @@
     </div>
     
     <button id="reset-time">Reset Chart</button>
+    <h3 id="balance">Balance: </h3>
 
+    <form name="position-form">
+        Type: <input type="text" name="type">
+        Size: <input type="number" step="0.01" name="size">
+        Pair: <input type="text" name="pair">
+        TP: <input type="number" step="0.00001" name="tp">
+        SL: <input type="number" step="0.00001" name="sl">
+        <button id="open-position" type="button" >Open Position</button>
+    </form>
+
+    <script type="module" src="/Frontend/js/broker.js"></script>
     <script type="module" src="/Frontend/js/chart.js"></script> 
     
 </body>

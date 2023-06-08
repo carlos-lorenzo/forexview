@@ -1,6 +1,6 @@
 .trading-view {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 
     
     grid-row-gap: 20px;
@@ -17,6 +17,5 @@
 }
 
 .chart {
-    width: 30vw;
-
+    width: 15vw;
 }

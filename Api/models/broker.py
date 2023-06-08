@@ -29,21 +29,29 @@ class Broker:
         return f"Balance: {self.balance}\nEquity: {self.equity}\nAvailable pairs: {' | '.join(self.pairs.keys())}"
     
     
-    def open_position(self, order_type: str, size: float, pair: str, take_profit: float = None, stop_loss: float = None) -> None:
+    def open_position(self, order_type: str, size: float, pair: str, take_profit: float = None, stop_loss: float = None) -> Dict[str, str]:
         pair = pair.upper()
         
         current_rate = self.pairs.get(pair).get_current_candle().get("close")
         
-        new_position = Position(order_type=order_type, 
-                                starting_size=size, 
-                                order_rate=current_rate,
-                                pair=pair,
-                                take_profit=take_profit,
-                                stop_loss=stop_loss)
+        
+        if size <= self.balance:
+            new_position = Position(order_type=order_type, 
+                                    starting_size=size, 
+                                    order_rate=current_rate,
+                                    pair=pair,
+                                    take_profit=take_profit,
+                                    stop_loss=stop_loss)
+        
+            self.open_positions.append(new_position)
+            
+            return {"status": "success"}
+
+        
+        else:
+            return {"status": "not enough balance"}
         
         
-        self.open_positions.append(new_position)
-    
     def update(self) -> None:
         for position in self.open_positions:
             current_candle = self.pairs.get(position.pair).get_current_candle()
