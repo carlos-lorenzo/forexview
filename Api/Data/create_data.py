@@ -1,6 +1,9 @@
 from typing import Dict, List
 
 import pandas as pd
+import numpy as np
+
+
 
 def interval_to_minutes(interval: str) -> int:
     """
@@ -90,8 +93,7 @@ df = df.rename(columns={"Open": "open",
                         "Close": "close"})
 
 
-
-df["time"] = pd.to_datetime(df["Time"]).astype('int64') / 10**9
+df["time"] = np.arange(0, len(df), 1)
 
 df = df.drop(["Volume", "Time"], axis=1)
 
@@ -110,9 +112,9 @@ df.to_csv("Api/Data/1m_EURUSD.csv", index=False)
 }
 
 
+
 for tf, ohlc_data in time_frames.items():
     df: pd.DataFrame = ohlc_data.get("ohlc")
-    df.to_csv(f"{tf}_EURUSD_F.csv", index=False)
-
+    df.to_csv(f"Api/Data/{tf}_EURUSD.csv", index=False)
 
 """

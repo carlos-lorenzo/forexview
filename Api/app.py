@@ -3,6 +3,7 @@ import pandas as pd
 from models.broker import Broker
 from models.pair import Pair
 
+
 eur_usd_time_frames = {
     "1m": {"ohlc": pd.read_csv("Data/1m_EURUSD.csv"), "n_candles": 1},
     "15m": {"ohlc": pd.read_csv("Data/15m_EURUSD.csv"), "n_candles": 15},

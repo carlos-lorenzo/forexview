@@ -1,22 +1,25 @@
 import { createChart } from '/node_modules/lightweight-charts/dist/lightweight-charts.standalone.development.mjs';
 
-import { updateBalance } from "/Frontend/js/broker.js"
+import { updateBroker } from "/Frontend/js/broker.js"
 
-document.getElementById("reset-time").addEventListener("click", function(){
-    fetch("http://127.0.0.1:5000/api/reset-time", {
+document.getElementById("reset").addEventListener("click", function(){
+    fetch("http://127.0.0.1:5000/api/reset?pair=EURUSD", {
         method: "POST"})
     .then(function() {
-        window.location.reload();
+        updateBroker();
+        
+
     })
 })
 
 
 function createCandleChart(timeFrame) {
     const chartContainer = document.getElementById(timeFrame)
+    chartContainer.innerHTML = "";
     const chart = createChart(chartContainer, { width: 500, height: 500 });
     const candlestickSeries = chart.addCandlestickSeries({
         upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
-        wickUpColor: '#26a69a', wickDownColor: '#ef5350', priceFormat: { type: 'price', precision: 5, minMove: 0.0001 }
+        wickUpColor: '#26a69a', wickDownColor: '#ef5350', priceFormat: { type: 'price', precision: 5, minMove: 0.00001 }
     });
 
     chart.priceScale('right').applyOptions({
@@ -27,12 +30,13 @@ function createCandleChart(timeFrame) {
         
     })
 
-    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}`, {
+    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=EURUSD`, {
         method: "POST"})
     .then(response => response.json())  
     .then(chartData => {
         candlestickSeries.setData(chartData);
-        chart.timeScale().fitContent(); 
+        chart.timeScale().fitContent();
+
     })
 
     return {
@@ -43,7 +47,7 @@ function createCandleChart(timeFrame) {
 
 
 function setChartData(timeFrame, candlestickSeries){
-    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}`, {
+    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=EURUSD`, {
         method: "POST"})
     .then(response => response.json())  
     .then(chartData => {
@@ -52,7 +56,7 @@ function setChartData(timeFrame, candlestickSeries){
 }
 
 function updateChart(timeFrame,  candlestickSeries){
-    fetch(`http://127.0.0.1:5000/api/new-candle?tf=${timeFrame}`, {
+    fetch(`http://127.0.0.1:5000/api/new-candle?tf=${timeFrame}&pair=EURUSD`, {
             method: "POST"})  
         .then(response => response.json())
         .then(newCandleData => {
@@ -81,7 +85,7 @@ chartUpdates.forEach(updateData => {
 
     button.addEventListener('click', function () {
 
-        fetch(`http://127.0.0.1:5000/api/update-time?tf=${timeFrame}`, {method: "GET"})
+        fetch(`http://127.0.0.1:5000/api/update-time?tf=${timeFrame}&pair=EURUSD`, {method: "GET"})
         
         for (let chartTimeFrame in charts) {
 
@@ -94,6 +98,20 @@ chartUpdates.forEach(updateData => {
             }
         }
         
-        updateBalance()
+        updateBroker()
     });
+})
+
+document.getElementById("reset").addEventListener("click", function(){
+    fetch("http://127.0.0.1:5000/api/reset?pair=EURUSD", {
+        method: "POST"})
+    .then(function() {
+        updateBroker();
+        
+        charts = {};
+
+        timeFrames.forEach(timeFrame => {
+            charts[timeFrame] = createCandleChart(timeFrame);
+        })
+    })
 })
