@@ -1,22 +1,131 @@
-.trading-view {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-
-    
-    grid-row-gap: 20px;
-    padding-right: 100px;
+:root {
+    --global--background-dark: #131722; 
+    --global--highlight: #1E53E5;
+    --global--positive: #26A69A;
+    --global--negative: #EF5350;
 }
 
+body {
+    font-family: 'Orbitron', sans-serif;
+    background-color: var(--global--background-dark);
+    color: white;
+}
 
-.chart-container {
+button {
+    font: inherit;
+    width: 20%;
+    background-color: transparent;
+    border-style: solid;
+    border-radius: 10px;
+    border-color: white;
+    color: white;
+    transition: 0.3s all ease-in-out;
+}
+
+button:hover {
+    scale: 1.2;
+}
+
+form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-}
-
-.chart {
-    width: 15vw;
+    gap: 10px;
     
 }
+
+input {
+    font: inherit;
+    background-color: transparent;
+    color: white;
+    border-color: transparent;
+}
+*::-webkit-input-placeholder {
+    color: white;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {  
+
+   opacity: 0;
+
+}
+
+#broker {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 6fr;
+    place-items: center; 
+}
+
+.form-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+}
+
+#long {
+    border-color: var(--global--positive);
+    color: var(--global--positive);
+}
+
+#short {
+    border-color: var(--global--negative);
+    color: var(--global--negative);
+}
+#metrics{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+#open-positions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+#reset {
+    width: 100%;
+}
+
+#reset:hover{
+    scale: 1.1;
+}
+
+#backtester {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 25px;
+}
+
+#trading-view {
+    width: 40vw;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#timeframe-selectors {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#time-dials {
+    width: 40vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.position {
+    display: flex;
+    flex-direction: row;
+    width: 45vw;
+    justify-content: space-evenly;
+}
+
+
+
+
