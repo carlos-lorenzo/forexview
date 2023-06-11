@@ -8,9 +8,13 @@ function createCandleChart(timeFrame) {
     let chartContainer = document.createElement("div");
     chartContainer.className = "chart";
     chartContainer.id = timeFrame;
-    console.log();
-    let chartWidth = (window.innerWidth * 0.4)
-    let chartHeight = (window.innerHeight * 0.6)
+    let chartWidth = (window.innerWidth * 0.5);
+
+    if (window.innerWidth <= 1300){
+        chartWidth = window.innerWidth;
+    }
+    
+    let chartHeight = (window.innerHeight * 0.6);
 
     const chart = createChart(chartContainer, {
         height: chartHeight, 
