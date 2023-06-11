@@ -10,7 +10,7 @@ function updateBroker() {
             method: "POST"})  
         .then(response => response.json())
         .then(equity => {
-            document.getElementById("equity").innerHTML = `Equity: ${equity["equity"]}`;
+            document.getElementById("equity").innerHTML = `Equity: ${Math.round(equity["equity"])}`;
     })
     
     

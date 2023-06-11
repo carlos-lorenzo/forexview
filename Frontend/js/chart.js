@@ -121,6 +121,8 @@ function setTimeDials(timeFrames, charts) {
                     setChartData(chartTimeFrame, candlestickSeries);
                 }
             }
+
+            updateBroker();
         })
 
         timeDials.appendChild(newCandleButton);
