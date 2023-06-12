@@ -110,9 +110,10 @@ class Pair:
                 
                 
             new_order_block = Order_Block(type=order_block_type,
-                                        start_time=time, 
-                                        max_rate=max_rate,
-                                        min_rate=min_rate)
+                                          pair=self.name,
+                                          start_time=time, 
+                                          max_rate=max_rate,
+                                          min_rate=min_rate)
             
             
             self.order_blocks.append(new_order_block)

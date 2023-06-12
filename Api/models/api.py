@@ -268,4 +268,15 @@ class API(Flask):
             
         return jsonify(open_positions_data)
         
-        
+    def fetch_order_blocks(self) -> Dict[str, List[Dict[str, float | str]]]:
+        order_blocks = {}
+        for pair in self.broker.pairs.keys():
+            pair_order_blocks = []
+            for pair_order_block in [order_block for order_block in self.broker.pairs.order_blocks if order_block.pair == pair]:
+                pair_order_blocks.append({
+                    "type": pair_order_block.type,
+                    "pair": pair_order_block.pair,
+                    "start_time": pair_order_block.start_time,
+                    "max_rate": pair_order_block.max_rate,
+                    "min_rate": pair_order_block.min_rate})
+        return jsonify({"test": "test"})

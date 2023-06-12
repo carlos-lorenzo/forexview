@@ -27,6 +27,7 @@ class Position:
         profit_loss (float): The profit | loss of a Position
         risk_reward (float): Risk-reward ratio, constant by which profit_loss is multiplied 
         active (bool): The status of the Position. False if take_profit | stop_loss surpassed
+        id (str): Alphanumeric unique identifier
         PIP: float: Standard FOREX unity. The smallest price movement possible (0.00001).
 
     Raises:
