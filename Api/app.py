@@ -23,18 +23,16 @@ pairs = {
 broker = Broker(balance=10000,
                 pairs=pairs)
 
-"""broker.open_position(order_type="long", size=100, pair="EURUSD")
+broker.pairs.get("EURUSD").add_order_block(order_block_type="bullish",
+                                           time=15000,
+                                           time_frame="15m")
 
-for i in range(100):
-    broker.update()
-   
-    broker.pairs.get("EURUSD").update_time(1)
-    try:
-        print(f"Rate: {broker.pairs['EURUSD'].get_current_candle().get('close')}. Equity: {broker.equity}")
-    except IndexError:
-        break"""
+
+
 
 api = broker.api
 api.run()
+
+
 
 
