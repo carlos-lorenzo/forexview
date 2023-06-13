@@ -1,4 +1,1 @@
-- Rename position.id -> position.uid
-- Unify generate_id into utils taking object as parameter
 - Visualise order_blocks
-- Create order_blocks from frontend
