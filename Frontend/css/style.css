@@ -19,7 +19,7 @@ button {
     border-radius: 10px;
     border-color: white;
     color: white;
-    transition: 0.3s all ease-in-out;
+    transition: 0.2s all ease-in-out;
 }
 
 button:hover {
@@ -91,7 +91,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 #reset:hover{
-    scale: 1.1;
+    scale: 1.05;
 }
 
 

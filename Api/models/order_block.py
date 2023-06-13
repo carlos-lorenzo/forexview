@@ -1,9 +1,6 @@
-import string
-import gc
-
 from dataclasses import dataclass, field
-from random import choices
-from typing import List
+
+from utils import generate_uid
 
 @dataclass
 class Order_Block:
@@ -34,30 +31,5 @@ class Order_Block:
     uid: str = field(init=False, default="")
     
     def __post_init__(self):
-        self.uid = self.assign_order_block_id()
+        self.uid = generate_uid(Model=Order_Block)
     
-    
-    def assign_order_block_id(self) -> str:
-        """
-        Returns a unique ID that no other Order_Block has
-
-        Returns:
-            str: A unique id
-        """
-        def generate_id() -> str:
-            """
-            Generates a 6 digit alphanumeric id
-
-            Returns:
-                str: _description_
-            """
-            return "".join(choices(string.ascii_letters + string.digits, k=6))
-        
-        
-        while True:
-            order_block_id: str = generate_id()
-            
-            order_blocks: List[Order_Block] = list(filter(lambda object: isinstance(object, Order_Block), gc.get_objects()))
-            
-            if order_block_id not in [order_block.uid for order_block in order_blocks]:
-                return order_block_id

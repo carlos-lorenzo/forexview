@@ -3,10 +3,12 @@ from typing import List, Dict
 
 from pandas import DataFrame
 
+import numpy as np
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from utils import defractalise_ohlc, interval_to_minutes
+from utils import interval_to_minutes
 
 from .broker import Broker
 from .pair import Pair
@@ -44,6 +46,9 @@ class API(Flask):
         self.route("/api/open-position", methods = ["POST", "GET"])(self.open_position)
         self.route("/api/close-position", methods = ["POST", "GET"])(self.close_position)
         self.route("/api/fetch-open-positions", methods = ["POST", "GET"])(self.get_open_positions)
+        self.route("/api/create-order-blocks", methods = ["POST", "GET"])(self.create_order_block)
+        self.route("/api/fetch-order-blocks", methods = ["POST", "GET"])(self.fetch_order_blocks)
+        
     
     
     def index(self) -> str:
@@ -84,7 +89,6 @@ class API(Flask):
         
         return jsonify(chart_data)
     
-    
     def get_current_candle(self) -> Dict[str, float]:
         """
         Fetch the current candle of a given time frame
@@ -110,7 +114,6 @@ class API(Flask):
         new_candle: Dict[str, float] = ohlc.iloc[last_candle_index].to_dict()
         
         return jsonify(new_candle)
-    
     
     def update_time(self) -> Dict[str, str]:
         """
@@ -150,17 +153,20 @@ class API(Flask):
         
         pair: str = args.get("pair", "EURUSD").upper()
         
-        pair_data: Pair = self.broker.pairs.get("EURUSD") # replace with pairs
+        pair_data: Pair = self.broker.pairs.get(pair) # replace with pairs
         
         pair_data.current_minute = pair_data.initilise_minute()
-
+        pair_data.order_blocks = []
+        
+        
         self.broker.balance = 10000
         self.broker.equity = self.broker.balance
         self.broker.open_positions = []
         
-        return jsonify({"status" : "time reset"})
-    
-    
+        
+        
+        return jsonify({"status" : "reset"})
+     
     def get_balance(self) -> Dict[str, float]:
         """
         Fetch the balance of self.Broker
@@ -169,8 +175,7 @@ class API(Flask):
             Dict[str, float]: Current balance
         """
         return jsonify({"balance": self.broker.balance})
-    
-    
+     
     def get_equity(self) -> Dict[str, float]:
         """
         Fetch the equity of self.Broker
@@ -219,7 +224,6 @@ class API(Flask):
                         "type": order_type,
                         "pair": pair,
                         "rate": self.broker.pairs.get(pair).get_current_candle()["close"]})
-    
         
     def close_position(self) -> Dict[str, str]:
         """
@@ -241,9 +245,6 @@ class API(Flask):
         
         return jsonify(meta)
         
-        
-    
-    
     def get_open_positions(self) -> List[Dict[str, str | float]]:
         """
         Fetches all open positions
@@ -258,7 +259,7 @@ class API(Flask):
         
         open_positions_data = []
         for position in open_positions:
-            open_positions_data.append({"id": position.id,
+            open_positions_data.append({"id": position.uid,
                                         "type": position.order_type,
                                         "open_rate": position.order_rate,
                                         "starting_size": position.starting_size,
@@ -269,14 +270,36 @@ class API(Flask):
         return jsonify(open_positions_data)
         
     def fetch_order_blocks(self) -> Dict[str, List[Dict[str, float | str]]]:
+        args = request.args
+        time_frame = args.get("tf", "15m")
+        
         order_blocks = {}
-        for pair in self.broker.pairs.keys():
+        for pair, pair_data in self.broker.pairs.items():
             pair_order_blocks = []
-            for pair_order_block in [order_block for order_block in self.broker.pairs.order_blocks if order_block.pair == pair]:
+            for pair_order_block in [order_block for order_block in pair_data.order_blocks if order_block.pair == pair]:
                 pair_order_blocks.append({
+                    "id": pair_order_block.uid,
                     "type": pair_order_block.type,
                     "pair": pair_order_block.pair,
-                    "start_time": pair_order_block.start_time,
                     "max_rate": pair_order_block.max_rate,
-                    "min_rate": pair_order_block.min_rate})
-        return jsonify({"test": "test"})
+                    "min_rate": pair_order_block.min_rate,
+                    "start_time": pair_order_block.start_time,
+                    "current_minute": pair_data.current_minute,
+                    "interval": interval_to_minutes(time_frame)})
+            
+            order_blocks[pair] = pair_order_blocks
+                
+        return jsonify(order_blocks)
+    
+    def create_order_block(self) -> Dict[str, str]:
+        args = request.args
+        pair: str = args.get("pair", "EURUSD")
+        order_block_type: str = args.get("type", "bullish")
+        time: int = int(args.get("time", 0))
+        time_frame: str = args.get("tf", "15m")
+        
+        meta = self.broker.pairs[pair].add_order_block(order_block_type=order_block_type,
+                                                       time=time,
+                                                       time_frame=time_frame)
+        
+        return jsonify(meta)

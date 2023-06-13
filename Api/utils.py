@@ -1,4 +1,6 @@
-
+import string
+import gc
+from random import choices
 from typing import Dict, List
 
 import pandas as pd
@@ -83,5 +85,37 @@ def defractalise_ohlc(df: pd.DataFrame, interval: str) -> Dict:
     }
 
 
+def generate_id(length) -> str:
+    """
+    Generates a 6 digit alphanumeric id
+
+    Returns:
+        str: alphanumeric id
+    """
+    return "".join(choices(string.ascii_letters + string.digits, k=length))
 
 
+def generate_uid(Model: object, length: int = 6) -> str:
+    """
+    Returns a unique ID that no other model has
+
+    Args:
+        Model (object): An object with a uid property
+    
+    Returns:
+        str: A unique id
+    """
+    
+    while True:
+        model_id: str = generate_id(length=length)
+        
+        models: List[Model] = list(filter(lambda object: isinstance(object, Model), gc.get_objects()))
+        
+        if model_id not in [model.uid for model in models]:
+            return model_id
+    
+    
+
+
+        
+    

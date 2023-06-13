@@ -14,6 +14,12 @@ class Pair:
     Args:
         name (str): The pair name
         time_frames (Dict[str, DataFrame | int]): Holds all time frames ("ohlc") an the number of 1m candles ("n_candles") required to form a single candle (row) in tha time frame
+    
+    Properties:
+        name (str): The pair name
+        time_frames (Dict[str, DataFrame | int]): Holds all time frames ("ohlc") an the number of 1m candles ("n_candles") required to form a single candle (row) in tha time frame
+        current_minute (int): The current time for that pair
+        order_blocks (List[Order_Block]): Holds all the Order_Block(s) for this Pair
     """
     name: str
     time_frames: Dict[str, DataFrame | int] = field(default_factory=dict)

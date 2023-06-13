@@ -4,6 +4,8 @@ from random import choices
 from dataclasses import dataclass, field
 from typing import Optional, Dict, List
 
+from utils import generate_uid
+
 
 @dataclass
 class Position:
@@ -49,14 +51,14 @@ class Position:
     risk_reward: float = field(init=False, default=1)
     active: bool = field(init=False, default=True)
     
-    id: str = field(init=False, default="")
+    uid: str = field(init=False, default="")
     
     PIP: float = 0.00001
     
     
     def __post_init__(self):
         
-        self.id = self.assign_position_id()
+        self.uid = generate_uid(Model=Position)
         
         self.order_type = self.order_type.lower()
         
@@ -77,31 +79,6 @@ class Position:
         else:
             self.risk_reward = round((self.order_rate - self.take_profit) / (self.stop_loss - self.order_rate))
           
-    
-    def assign_position_id(self) -> str:
-        """
-        Returns a unique ID that no other Position has
-
-        Returns:
-            str: A unique id
-        """
-        def generate_id() -> str:
-            """
-            Generates a 6 digit alphanumeric id
-
-            Returns:
-                str: _description_
-            """
-            return "".join(choices(string.ascii_letters + string.digits, k=6))
-        
-        
-        while True:
-            position_id: str = generate_id()
-            
-            positions: List[Position] = list(filter(lambda object: isinstance(object, Position), gc.get_objects()))
-            
-            if position_id not in [position.id for position in positions]:
-                return position_id
     
     
     def __update_profit_loss(self, current_rate: float) -> None:
