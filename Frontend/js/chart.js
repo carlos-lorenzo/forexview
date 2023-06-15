@@ -3,7 +3,7 @@ import { createChart } from '/node_modules/lightweight-charts/dist/lightweight-c
 import { updateBroker } from "/Frontend/js/broker.js"
 
 
-function fetchTimeFrameToDraw(validTimeFrames) {
+function fetchTimeFrameToDraw() {
     const urlParams = new URLSearchParams(window.location.search);
     const timeFrame = urlParams.get("tf")
 
@@ -15,33 +15,83 @@ function fetchTimeFrameToDraw(validTimeFrames) {
     }
 }
 
+
+function fetchPairToDraw() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pair = urlParams.get("pair")
+
+    if (pairs.includes(pair)){
+        
+        return pair;
+    } else {
+        return "EURUSD";
+    }
+}
+
 function createOrderBlock(timeFrame, pair, time, type) {
-    fetch(`http://127.0.0.1:5000//api/create-order-blocks?tf=${timeFrame}&pair=${pair}&time=${time}&type=${type}`, {
-        method: "POST"})
-        .then(response => response.json()) 
-        .then(status => {
-            console.log(status);
-    })
+    fetch(`http://127.0.0.1:5000//api/create-order-blocks?tf=${timeFrame}&pair=${pair}&time=${time}&type=${type}`, {method: "POST"})
+    
+    
 }
 
 function getOrderBlockArguments(param) {
     if (!param.point) {
         return;
     }
-    let timeFrame = fetchTimeFrameToDraw(validTimeFrames)[0];
-    let pair = "EURUSD";
+    let timeFrame = fetchTimeFrameToDraw()[0];
+    let pair = fetchPairToDraw()
     let time = param.time;
     
 
     if (param.sourceEvent.shiftKey) {
         let type = "bullish";
+        
         createOrderBlock(timeFrame, pair, time, type);
 
     } else if(param.sourceEvent.ctrlKey) {
         let type = "bearish";
         createOrderBlock(timeFrame, pair, time, type);
     }
+
+    
 }
+
+function drawOrderBlocks() {
+    let timeFrame = fetchTimeFrameToDraw();
+    let pair = fetchPairToDraw();
+    let chart = charts[timeFrame];
+    let colour = "red";
+    
+    
+    chart["orderBlocks"].forEach(orderBlock => {
+        chart["chart"].removeSeries(orderBlock);
+    })
+  
+    
+    
+
+    fetch(`http://127.0.0.1:5000//api/fetch-order-blocks?tf=${timeFrame}`, {method: "POST"})
+    .then(response => response.json())
+    .then(orderBlocksData => {
+
+        orderBlocksData[pair].forEach(orderBlockData => {
+            if (orderBlockData["data"]["type"] == "bullish"){
+                colour = "green"
+            }
+            
+            let orderBlockMax = charts[timeFrame]["chart"].addLineSeries({color: colour}).setData(orderBlockData["data"]["max_series_data"]);
+            let orderBlockMin = charts[timeFrame]["chart"].addLineSeries({color: colour}).setData(orderBlockData["data"]["min_series_data"]);
+
+            charts[timeFrame]["orderBlocks"].push(orderBlockMax);
+            charts[timeFrame]["orderBlocks"].push(orderBlockMin);
+        })
+        
+        
+            
+        })
+    }
+
+            
 
 
 
@@ -102,7 +152,7 @@ function createCandleChart(timeFrame) {
         title: timeFrame,
     })
 
-    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=EURUSD`, {
+    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=${fetchPairToDraw()}`, {
         method: "POST"})
     .then(response => response.json())  
     .then(chartData => {
@@ -118,44 +168,47 @@ function createCandleChart(timeFrame) {
 
     return {
         "chart": chart,
-        "candle": candlestickSeries
+        "candle": candlestickSeries,
+        "orderBlocks": []
     }
 }
 
 
 function setChartData(timeFrame, candlestickSeries){
-    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=EURUSD`, {
+    fetch(`http://127.0.0.1:5000/api/get-chart-data?tf=${timeFrame}&pair=${fetchPairToDraw()}`, {
         method: "POST"})
     .then(response => response.json())  
     .then(chartData => {
         candlestickSeries.setData(chartData);
+        
     })
 }
 
 function updateChart(timeFrame,  candlestickSeries){
-    fetch(`http://127.0.0.1:5000/api/new-candle?tf=${timeFrame}&pair=EURUSD`, {
+    fetch(`http://127.0.0.1:5000/api/new-candle?tf=${timeFrame}&pair=${fetchPairToDraw()}`, {
             method: "POST"})  
         .then(response => response.json())
         .then(newCandleData => {
             candlestickSeries.update(newCandleData);
+            
     })
 }
 
-function createCharts(timeFrames) {
+function createCharts() {
     charts = {};
+
     timeFrames.forEach(timeFrame => {
         charts[timeFrame] = createCandleChart(timeFrame);
     })
-
     return charts;
 }
 
 
-function setTimeDials(timeFrames, charts) {
+function setTimeDials(charts) {
     let timeDials = document.getElementById("time-dials");
     timeDials.innerHTML = "";
     
-    timeFrames.forEach(timeFrame => {
+    validTimeFrames.forEach(timeFrame => {
         let newCandleButton = document.createElement("button");
         newCandleButton.innerHTML = `Add ${timeFrame}`
         newCandleButton.addEventListener("click", function () {
@@ -171,7 +224,7 @@ function setTimeDials(timeFrames, charts) {
                     setChartData(chartTimeFrame, candlestickSeries);
                 }
             }
-
+            drawOrderBlocks();
             updateBroker();
         })
 
@@ -180,7 +233,7 @@ function setTimeDials(timeFrames, charts) {
     })
 }
 
-function drawTimeFrameSelectors(validTimeFrames) {
+function drawTimeFrameSelectors() {
     const timeFrameSelectors = document.getElementById("timeframe-selectors");
     timeFrameSelectors.innerHTML = "";
     validTimeFrames.forEach(timeFrame => {
@@ -206,22 +259,23 @@ function drawTimeFrameSelectors(validTimeFrames) {
 
 function openTimeFrame(pointerEvent) {
     
-    window.open(`http://127.0.0.1:5500/Frontend/html/?tf=${pointerEvent.target.innerHTML}`, "_self");
-    
+    window.open(`http://127.0.0.1:5500/Frontend/html/?tf=${pointerEvent.target.innerHTML}&pair=${fetchPairToDraw()}`, "_self"); 
+}
+
+function openPair(pointerEvent) {
+    window.open(`http://127.0.0.1:5500/Frontend/html/?tf=${fetchTimeFrameToDraw()[0]}&pair=${pointerEvent.target.innerHTML}`, "_self"); 
 }
 
 
-
-
-
-
+const pairs = ["EURUSD"]
 const validTimeFrames = ["1m", "15m", "4h", "1D"]
 const timeFrames = fetchTimeFrameToDraw(validTimeFrames);
 
 
-var charts = createCharts(timeFrames);
-drawTimeFrameSelectors(validTimeFrames);
-setTimeDials(validTimeFrames, charts);
+var charts = createCharts();
+drawTimeFrameSelectors();
+setTimeDials(charts);
+drawOrderBlocks();
 
 document.getElementById("reset").addEventListener("click", function(){
     fetch("http://127.0.0.1:5000/api/reset?pair=EURUSD", {
@@ -231,8 +285,8 @@ document.getElementById("reset").addEventListener("click", function(){
         document.getElementById("time-dials").innerHTML = "";
         updateBroker();
         
-        charts = createCharts(timeFrames);
-        drawTimeFrameSelectors(validTimeFrames);
-        setTimeDials(validTimeFrames, charts);
+        charts = createCharts();
+        drawTimeFrameSelectors();
+        setTimeDials(charts);
     })
 })

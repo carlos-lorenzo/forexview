@@ -23,11 +23,6 @@ pairs = {
 broker = Broker(balance=10000,
                 pairs=pairs)
 
-broker.pairs.get("EURUSD").add_order_block(order_block_type="bullish",
-                                           time=15000,
-                                           time_frame="15m")
-
-
 
 
 api = broker.api

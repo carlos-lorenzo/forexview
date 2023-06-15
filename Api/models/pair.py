@@ -39,7 +39,7 @@ class Pair:
         Returns:
             int: Current minute
         """
-        return max([ohlc_data.get("n_candles") for ohlc_data in self.time_frames.values()]) * 30
+        return max([ohlc_data.get("n_candles") for ohlc_data in self.time_frames.values()]) * 5
 
     
     
@@ -79,9 +79,9 @@ class Pair:
         
         if order_block_type in ["bullish", "bearish"] and time > 0:
         
-            time_frame_data: Dict[str, DataFrame | int] = self.time_frames.get(time_frame, "1m")
+            time_frame_data: Dict[str, DataFrame | int] = self.time_frames.get(time_frame)
             
-            ohlc: DataFrame = time_frame_data["ohlc"] if time_frame_data.get("n_candles", 1) % time == 0 else self.time_frames["1m"]["ohlc"] # If time stated could be found in self.time_frames
+            ohlc: DataFrame = time_frame_data["ohlc"]
             
         
             order_block_candle = ohlc.loc[ohlc["time"] == time]
@@ -98,7 +98,7 @@ class Pair:
             
             if order_block_type == "bullish":
                 if wick_down_size > body_size:
-                    max_rate: float = order_block_candle["close"].values[0]
+                    max_rate: float = order_block_candle["open"].values[0]
                     min_rate: float = order_block_candle["low"].values[0]
 
                 else:
@@ -108,7 +108,7 @@ class Pair:
             else:
                 if wick_up_size > body_size:
                     max_rate: float = order_block_candle["high"].values[0]
-                    min_rate: float = order_block_candle["open"].values[0]
+                    min_rate: float = order_block_candle["close"].values[0]
 
                 else:
                     max_rate: float = order_block_candle["high"].values[0]
@@ -124,7 +124,7 @@ class Pair:
             
             self.order_blocks.append(new_order_block)
             
-            return {"created": True}
+            return {"created": True, "id": new_order_block.uid}
         
         else:
             return {"created": False}

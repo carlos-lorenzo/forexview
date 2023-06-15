@@ -80,8 +80,8 @@ class API(Flask):
         
         ohlc: DataFrame = pair_data.time_frames.get(time_frame, "1m").get("ohlc")
         last_candle_index: int = pair_data.current_minute // interval_to_minutes(time_frame)
-        if last_candle_index > 1000:
-            first_candle_index = last_candle_index - 1000
+        if last_candle_index > 3000:
+            first_candle_index = last_candle_index - 3000
         else:
             first_candle_index = 0
             
@@ -277,15 +277,15 @@ class API(Flask):
         for pair, pair_data in self.broker.pairs.items():
             pair_order_blocks = []
             for pair_order_block in [order_block for order_block in pair_data.order_blocks if order_block.pair == pair]:
-                pair_order_blocks.append({
-                    "id": pair_order_block.uid,
-                    "type": pair_order_block.type,
-                    "pair": pair_order_block.pair,
-                    "max_rate": pair_order_block.max_rate,
-                    "min_rate": pair_order_block.min_rate,
-                    "start_time": pair_order_block.start_time,
-                    "current_minute": pair_data.current_minute,
-                    "interval": interval_to_minutes(time_frame)})
+                pair_order_blocks.append({"id": pair_order_block.uid, "data": {
+                        "type": pair_order_block.type,
+                        "max_rate": pair_order_block.max_rate,
+                        "min_rate": pair_order_block.min_rate,
+                        "max_series_data": [{"time": time, "value": pair_order_block.max_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, interval_to_minutes(time_frame))],
+                        "min_series_data": [{"time": time, "value": pair_order_block.min_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, interval_to_minutes(time_frame))],
+                        }})
+    
+                    
             
             order_blocks[pair] = pair_order_blocks
                 
