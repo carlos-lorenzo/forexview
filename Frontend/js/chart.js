@@ -85,10 +85,7 @@ function drawOrderBlocks() {
             charts[timeFrame]["orderBlocks"].push(orderBlockMin);
         
             
-        })
-        
-        
-            
+        })    
         })
     }
 
