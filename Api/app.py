@@ -23,8 +23,6 @@ pairs = {
 broker = Broker(balance=10000,
                 pairs=pairs)
 
-
-
 api = broker.api
 api.run()
 
