@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from pandas import DataFrame
+from pandas import DataFrame, Series
 
 
 from .order_block import Order_Block
@@ -128,3 +128,25 @@ class Pair:
         
         else:
             return {"created": False}
+
+
+    def filter_order_blocks(self) -> None:
+        """
+        Removes order blocks that have been mitigated (price has surpassed 50% of the orderblock) from self.order_blocks
+        """
+        current_candle: Series = self.time_frames["1m"]["ohlc"].iloc[self.current_minute]
+        
+        
+        
+        for i, order_block in enumerate(self.order_blocks):
+            mid_point: float = ((order_block.max_rate + order_block.min_rate) / 2)
+            
+            if order_block.type == "bullish":
+                if current_candle["low"] <= mid_point:
+                    self.order_blocks.pop(i)
+                   
+                    
+            else:
+                if current_candle["high"] >= mid_point:
+                    self.order_blocks.pop(i)
+                    

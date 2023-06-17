@@ -30,8 +30,6 @@ function fetchPairToDraw() {
 
 function createOrderBlock(timeFrame, pair, time, type) {
     fetch(`http://127.0.0.1:5000//api/create-order-blocks?tf=${timeFrame}&pair=${pair}&time=${time}&type=${type}`, {method: "POST"})
-    
-    
 }
 
 function getOrderBlockArguments(param) {
@@ -66,7 +64,6 @@ function drawOrderBlocks() {
     chart["orderBlocks"].forEach(orderBlock => {
         chart["chart"].removeSeries(orderBlock);
     })
-  
     
     
 
@@ -79,11 +76,15 @@ function drawOrderBlocks() {
                 colour = "green"
             }
             
-            let orderBlockMax = charts[timeFrame]["chart"].addLineSeries({color: colour}).setData(orderBlockData["data"]["max_series_data"]);
-            let orderBlockMin = charts[timeFrame]["chart"].addLineSeries({color: colour}).setData(orderBlockData["data"]["min_series_data"]);
+            let orderBlockMax = chart["chart"].addLineSeries({color: colour})
+            orderBlockMax.setData(orderBlockData["data"]["max_series_data"]);
+            let orderBlockMin = charts[timeFrame]["chart"].addLineSeries({color: colour});
+            orderBlockMin.setData(orderBlockData["data"]["min_series_data"]);
 
             charts[timeFrame]["orderBlocks"].push(orderBlockMax);
             charts[timeFrame]["orderBlocks"].push(orderBlockMin);
+        
+            
         })
         
         

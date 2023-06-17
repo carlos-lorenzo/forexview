@@ -61,7 +61,7 @@ class API(Flask):
         return 'Welcome to the API!'
     
 
-    def get_data(self)  -> List[Dict[str, float]]:
+    def get_data(self) -> List[Dict[str, float]]:
         """
         Fetch the candles for a given pair and time frame will provide the last 1000 candles 
 

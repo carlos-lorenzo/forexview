@@ -34,7 +34,7 @@ class Broker:
     
     
     
-    
+        
     def __post_init__(self):
         from .api import API
         self.equity = self.balance
@@ -107,9 +107,7 @@ class Broker:
         
     def update(self) -> None:
         """
-        Updates all positions, balances and equity
-        
-        
+        Updates all positions, balances, equity and order blocks
         """
         for position in self.open_positions:
             current_candle = self.pairs.get(position.pair).get_current_candle()
@@ -120,7 +118,12 @@ class Broker:
             if not position.active:
                 self.balance += (position.starting_size + position.profit_loss)
                 self.closed_positions.append(self.open_positions.pop(self.open_positions.index(position)))
-                
+        
+        
+        for pair in self.pairs.values():
+            pair.filter_order_blocks()
+            
+        
         self.equity = self.balance + sum([(position.starting_size + position.profit_loss) for position in self.open_positions])
             
     
