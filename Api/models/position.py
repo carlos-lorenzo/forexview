@@ -1,11 +1,7 @@
-import gc
-import string
-from random import choices
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 
 from utils import generate_uid
-
 
 @dataclass
 class Position:
