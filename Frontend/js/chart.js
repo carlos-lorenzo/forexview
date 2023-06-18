@@ -60,10 +60,12 @@ function drawOrderBlocks() {
     let chart = charts[timeFrame];
     let colour = "red";
     
+    if (chart["orderBlocks"].length > 0){
+        chart["orderBlocks"].forEach(orderBlock => {
+            chart["chart"].removeSeries(orderBlock);
+        })
+    }
     
-    chart["orderBlocks"].forEach(orderBlock => {
-        chart["chart"].removeSeries(orderBlock);
-    })
     
     
 

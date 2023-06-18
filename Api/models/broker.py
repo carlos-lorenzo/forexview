@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 
+import utils
+
 from .position import Position
 from .pair import Pair
 
@@ -95,7 +97,7 @@ class Broker:
         """
         
         for position in self.open_positions:
-            if position.id == position_id:
+            if position.uid == position_id:
                 position.active = False
                 self.update()
                 return {"status": f"Position {position.id} closed"}
@@ -128,6 +130,7 @@ class Broker:
             
     
 
-
+    def save(self, filename: str = "broker") -> None:
+        utils.serialise_model(model=self, filename=filename)
     
 

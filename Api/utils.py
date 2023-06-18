@@ -1,9 +1,11 @@
 import string
 import gc
 from random import choices
-from typing import Dict, List
+from typing import Dict, List, Any
+import pickle
 
 import pandas as pd
+
 
 
 def interval_to_minutes(interval: str) -> int:
@@ -116,6 +118,9 @@ def generate_uid(Model: object, length: int = 6) -> str:
     
     
 
-
-        
+def serialise_model(model: Any, filename: str = "model") -> None:
+    pickle.dump(model, open(filename, "wb"))
     
+    
+def load_model(filename: str = "model") -> Any:
+    return pickle.load(open(filename, "rb"))

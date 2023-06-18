@@ -3,12 +3,10 @@ from typing import List, Dict
 
 from pandas import DataFrame
 
-import numpy as np
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from utils import interval_to_minutes
+import utils
 
 from .broker import Broker
 from .pair import Pair
@@ -48,6 +46,8 @@ class API(Flask):
         self.route("/api/fetch-open-positions", methods = ["POST", "GET"])(self.get_open_positions)
         self.route("/api/create-order-blocks", methods = ["POST", "GET"])(self.create_order_block)
         self.route("/api/fetch-order-blocks", methods = ["POST", "GET"])(self.fetch_order_blocks)
+        #self.route("/api/save-broker", methods = ["POST", "GET"])(self.save_broker)
+        #self.route("/api/load-broker", methods = ["POST", "GET"])(self.load_broker)
         
     
     
@@ -79,7 +79,7 @@ class API(Flask):
         pair_data: Pair = self.broker.pairs.get(pair, "EURUSD")
         
         ohlc: DataFrame = pair_data.time_frames.get(time_frame, "1m").get("ohlc")
-        last_candle_index: int = pair_data.current_minute // interval_to_minutes(time_frame)
+        last_candle_index: int = pair_data.current_minute // utils.interval_to_minutes(time_frame)
         if last_candle_index > 3000:
             first_candle_index = last_candle_index - 3000
         else:
@@ -104,10 +104,11 @@ class API(Flask):
         time_frame: str = args.get("tf", "1m")
         pair: str = args.get("pair", "EURUSD").upper()
         
+        
         pair_data: Pair = self.broker.pairs.get("EURUSD") # replace with pair
         
         ohlc: DataFrame = pair_data.time_frames.get(time_frame, "1m").get("ohlc")
-        last_candle_index: int = pair_data.current_minute // interval_to_minutes(time_frame)
+        last_candle_index: int = pair_data.current_minute // utils.interval_to_minutes(time_frame)
         
         
         
@@ -136,7 +137,7 @@ class API(Flask):
         
         pair_data: Pair = self.broker.pairs.get("EURUSD") # replace with pair
         
-        pair_data.current_minute += interval_to_minutes(time_frame)
+        pair_data.current_minute += utils.interval_to_minutes(time_frame)
         
         self.broker.update()
         
@@ -281,8 +282,8 @@ class API(Flask):
                         "type": pair_order_block.type,
                         "max_rate": pair_order_block.max_rate,
                         "min_rate": pair_order_block.min_rate,
-                        "max_series_data": [{"time": time, "value": pair_order_block.max_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, interval_to_minutes(time_frame))],
-                        "min_series_data": [{"time": time, "value": pair_order_block.min_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, interval_to_minutes(time_frame))],
+                        "max_series_data": [{"time": time, "value": pair_order_block.max_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, utils.interval_to_minutes(time_frame))],
+                        "min_series_data": [{"time": time, "value": pair_order_block.min_rate} for time in range(pair_order_block.start_time, pair_data.current_minute, utils.interval_to_minutes(time_frame))],
                         }})
     
                     
@@ -303,3 +304,24 @@ class API(Flask):
                                                        time_frame=time_frame)
         
         return jsonify(meta)
+    
+    
+    def save_broker(self) -> Dict[str, bool]:
+        
+        
+        args = request.args
+        
+        filename = args.get("filename", "broker")
+        
+        self.broker.save(filename=filename)
+        
+        return jsonify({"Saved": True})
+        
+    
+    def load_broker(self) -> Dict[str, bool]:
+        args = request.args
+        
+        filename = args.get("filename", "broker")
+        self.broker = utils.load_model(filename=filename)
+        
+        return jsonify({"Loaded": True})
