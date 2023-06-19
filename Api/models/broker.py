@@ -131,6 +131,6 @@ class Broker:
     
 
     def save(self, filename: str = "broker") -> None:
-        utils.serialise_model(model=self, filename=filename)
+        utils.serialise_model(Model=self, filename=filename)
     
 

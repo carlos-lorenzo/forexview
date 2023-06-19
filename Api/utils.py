@@ -2,7 +2,7 @@ import string
 import gc
 from random import choices
 from typing import Dict, List, Any
-import pickle
+import dill
 
 import pandas as pd
 
@@ -118,9 +118,13 @@ def generate_uid(Model: object, length: int = 6) -> str:
     
     
 
-def serialise_model(model: Any, filename: str = "model") -> None:
-    pickle.dump(model, open(filename, "wb"))
+def serialise_model(Model: object, filename: str = "model") -> None:
+    with open(filename, "wb") as model_file:
+        dill.dump(Model, model_file)
+        
     
     
-def load_model(filename: str = "model") -> Any:
-    return pickle.load(open(filename, "rb"))
+def load_model(filename: str = "model") -> object:
+    with open(filename, "rb") as model_file:
+        return dill.load(model_file)
+        

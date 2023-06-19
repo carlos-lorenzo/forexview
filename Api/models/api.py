@@ -46,8 +46,8 @@ class API(Flask):
         self.route("/api/fetch-open-positions", methods = ["POST", "GET"])(self.get_open_positions)
         self.route("/api/create-order-blocks", methods = ["POST", "GET"])(self.create_order_block)
         self.route("/api/fetch-order-blocks", methods = ["POST", "GET"])(self.fetch_order_blocks)
-        #self.route("/api/save-broker", methods = ["POST", "GET"])(self.save_broker)
-        #self.route("/api/load-broker", methods = ["POST", "GET"])(self.load_broker)
+        self.route("/api/save-broker", methods = ["POST", "GET"])(self.save_broker)
+        self.route("/api/load-broker", methods = ["POST", "GET"])(self.load_broker)
         
     
     
@@ -307,10 +307,7 @@ class API(Flask):
     
     
     def save_broker(self) -> Dict[str, bool]:
-        
-        
         args = request.args
-        
         filename = args.get("filename", "broker")
         
         self.broker.save(filename=filename)
@@ -320,8 +317,8 @@ class API(Flask):
     
     def load_broker(self) -> Dict[str, bool]:
         args = request.args
-        
         filename = args.get("filename", "broker")
+        
         self.broker = utils.load_model(filename=filename)
         
         return jsonify({"Loaded": True})
